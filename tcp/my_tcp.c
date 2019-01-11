@@ -13,11 +13,11 @@
 #define SERVER_ADDR "127.0.0.1"
 
 int TcpCreate(char* serverAddr){
-    int clientSock;
+    int sockId;
     char buffer[MAX_LEN];
     
-    clientSock = socket(PF_INET,SOCK_STREAM,IPPROTO_TCP);
-    if(clientSock == -1){
+    sockId = socket(PF_INET,SOCK_STREAM,IPPROTO_TCP);
+    if(sockId == -1){
         perror("tcp_send: socket create error");
     }
     struct sockaddr_in server;
@@ -27,11 +27,11 @@ int TcpCreate(char* serverAddr){
     server.sin_addr.s_addr = inet_addr(serverAddr);
 
     int ret;
-    ret = connect(clientSock,(struct sockaddr*)&server,sizeof(server));
+    ret = connect(sockId,(struct sockaddr*)&server,sizeof(server));
     if(ret == -1){
         perror("tcp_create: socket connect error");
     }
-    return clientSock;
+    return sockId;
 }
 void TcpSend(int sockId,char buffer[]){
     int charCount=strlen(buffer);
