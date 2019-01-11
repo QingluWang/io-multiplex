@@ -10,15 +10,11 @@
 
 #define TCP_PORT 17989
 #define MAX_LEN 100
-#define SERVER_ADDR "127.0.0.1"
 
 int TcpCreate(char* serverAddr){
-    int sockId;
-    char buffer[MAX_LEN];
-    
-    sockId = socket(PF_INET,SOCK_STREAM,IPPROTO_TCP);
+    int sockId=socket(PF_INET,SOCK_STREAM,IPPROTO_TCP);
     if(sockId == -1){
-        perror("tcp_send: socket create error");
+        perror("TcpCreate: socket create error");
     }
     struct sockaddr_in server;
     memset(&server,0,sizeof(server));
@@ -26,10 +22,9 @@ int TcpCreate(char* serverAddr){
     server.sin_port = htons(TCP_PORT);
     server.sin_addr.s_addr = inet_addr(serverAddr);
 
-    int ret;
-    ret = connect(sockId,(struct sockaddr*)&server,sizeof(server));
+    int ret=connect(sockId,(struct sockaddr*)&server,sizeof(server));
     if(ret == -1){
-        perror("tcp_create: socket connect error");
+        perror("TcpCreate: socket connect error");
     }
     return sockId;
 }
@@ -37,8 +32,8 @@ void TcpSend(int sockId,char buffer[]){
     int charCount=strlen(buffer);
     int sendBytes=send(sockId, buffer, charCount, 0);
     if(sendBytes<0){
-            perror("tcp_send: send file error");  
-            exit(0); 
+        perror("TcpSend: send message error");  
+        exit(0); 
     }
     //bzero(buffer,MAX_LEN);
 }
