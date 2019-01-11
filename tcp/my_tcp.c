@@ -8,23 +8,10 @@
 #include <netdb.h>
 #include <time.h>
 
-#define TCP_PORT 17989
-#define MAX_LEN 100
-
-int TcpCreate(char* serverAddr){
+int TcpCreate(){
     int sockId=socket(PF_INET,SOCK_STREAM,IPPROTO_TCP);
     if(sockId == -1){
         perror("TcpCreate: socket create error");
-    }
-    struct sockaddr_in server;
-    memset(&server,0,sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_port = htons(TCP_PORT);
-    server.sin_addr.s_addr = inet_addr(serverAddr);
-
-    int ret=connect(sockId,(struct sockaddr*)&server,sizeof(server));
-    if(ret == -1){
-        perror("TcpCreate: socket connect error");
     }
     return sockId;
 }
