@@ -15,7 +15,7 @@ int TcpCreate(){
     }
     return sockId;
 }
-void TcpSend(int sockId,char buffer[]){
+void TcpSend(int sockId,const char* buffer){
     int charCount=strlen(buffer);
     int sendBytes=send(sockId, buffer, charCount, 0);
     if(sendBytes<0){
