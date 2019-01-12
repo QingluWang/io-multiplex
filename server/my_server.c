@@ -18,7 +18,6 @@
 #include "../tcp/my_tcp.h"
 
 
-
 #define MAXEPOLLSIZE 10000
 int setnonblocking(int sockfd) 
 { 
@@ -62,7 +61,7 @@ void* PthreadHandleMsg(void* para){
 int ServerInit(uint16_t port){
     /* 设置每个进程允许打开的最大文件数 */ 
     struct rlimit rt;
-    rt.rlim_max = rt.rlim_cur = MAXEPOLLSIZE+5; 
+    rt.rlim_max = rt.rlim_cur = MAXEPOLLSIZE; 
     if (setrlimit(RLIMIT_NOFILE, &rt) == -1) { 
         perror("ServerListen:setrlimit"); 
         exit(1); 
@@ -136,26 +135,6 @@ void ServerListen(int serverSockId){
                 }
             }
         }
-
-
-        /*struct sockaddr_in client;
-        socklen_t   length = sizeof(client);
-        int clientSockId = accept(serverSockId, (struct sockaddr*)&client, &length);
-        if (clientSockId < 0)
-        {
-            printf("ServerListen:server accept failed!\n");
-            break;
-        }
-
-        char buffer[MAX_LEN];
-        bzero(buffer, sizeof(buffer));
-        length = recv(clientSockId, buffer, MAX_LEN, 0);
-        if (length < 0)
-        {
-            printf("ServerListen:server recieve data failed!\n");
-            break;
-        }
-        printf("Received:%s\n",buffer);*/
     }
 }
 
