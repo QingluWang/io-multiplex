@@ -63,7 +63,13 @@ void ServerListen(int serverSockId){
                     perror("ServerListen:accept error!\n");
                     continue;
                 }
-                
+                setnonblocking(newFd);
+                ev.events = EPOLLIN | EPOLLET; 
+                ev.data.fd = newFd;
+                if(epoll_ctl(epfd,EPOLL_CTL_ADD,newFd,&ev)<0){
+                    fprintf("ServerListen:put socket %d to epoll failed",newFd);
+                }
+                curds++;
             }
         }
 
