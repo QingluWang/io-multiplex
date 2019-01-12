@@ -17,8 +17,6 @@
 #include "../util/my_util.h"
 #include "../tcp/my_tcp.h"
 
-
-#define MAXEPOLLSIZE 10000
 int setnonblocking(int sockfd) 
 { 
     if (fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFD, 0)|O_NONBLOCK) == -1) { 
@@ -61,7 +59,7 @@ void* PthreadHandleMsg(void* para){
 int ServerInit(uint16_t port){
     /* 设置每个进程允许打开的最大文件数 */ 
     struct rlimit rt;
-    rt.rlim_max = rt.rlim_cur = MAXEPOLLSIZE; 
+    rt.rlim_max = rt.rlim_cur = MAXEPOLLSIZE+5;//server has 5 gap 
     if (setrlimit(RLIMIT_NOFILE, &rt) == -1) { 
         perror("ServerListen:setrlimit"); 
         exit(1); 

@@ -11,7 +11,7 @@ static const uint16_t port=17989;
 int main(int argc,char* argv[]){
     char buffer[MAX_LEN];  
     bzero(buffer,sizeof(buffer));
-    for(int i=0; i<10000; i++){
+    for(int i=0; i<MAXEPOLLSIZE; i++){
         int sockId=ClientConnect(serverAddr,port);
         //int num=RandomNum(1000);
         sprintf(buffer,"%d",i);

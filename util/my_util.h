@@ -3,6 +3,7 @@
 
 #define MAX_LEN 1024
 #define MAX_OPEN 128//max client count
+#define MAXEPOLLSIZE 10000
 
 int RandomNum(int max);
 
