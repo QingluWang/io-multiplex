@@ -61,7 +61,9 @@ void ServerListen(int serverSockId){
                 newFd=accept(serverSockId,(struct sockaddr*)&client,&length);
                 if(newFd<0){
                     perror("ServerListen:accept error!\n");
+                    continue;
                 }
+                
             }
         }
 
