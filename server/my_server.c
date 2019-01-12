@@ -9,6 +9,7 @@
 #include <netdb.h>
 #include <time.h>
 #include <sys/epoll.h>
+#include <pthread.h>
 #include "../util/my_util.h"
 #include "../tcp/my_tcp.h"
 
@@ -30,6 +31,7 @@ int ServerInit(uint16_t port){
     if(listen(sockId,4) < 0){
         perror("ServerInit: socket listen error");
     };
+    setnonblocking(sockId);
     return sockId;
 }
 void ServerListen(int serverSockId){
@@ -37,19 +39,34 @@ void ServerListen(int serverSockId){
     struct epoll_event events[MAXEPOLLSIZE];
     int epfd = epoll_create(MAXEPOLLSIZE);
     if( -1 == epfd ){  
-        perror ("ServerListen:epoll create failed!\n");  
+        perror ("ServerListen:epoll create error!\n");  
     }
     ev.data.fd=serverSockId;
-    ev.events=EPOLLIN;
+    ev.events=EPOLLIN | EPOLLET;
     int ret = epoll_ctl(epfd, EPOLL_CTL_ADD, serverSockId, &ev); 
     if(-1 == ret){
-        perror ("ServerListen:epoll ctl failed!\n");  
+        perror ("ServerListen:epoll ctl error!\n");  
     }
-    int nfds,maxi;
+    int newFd,nfds,maxi,curds=1;
+    struct sockaddr_in client;
+    socklen_t length = sizeof(struct sockaddr_in);
     while(1){
-        nfds = epoll_wait(epfd,events,20,500);
+        nfds = epoll_wait(epfd,events,curds,-1);
+        if(-1 == nfds){
+            perror("ServerListen:epoll wait error!\n");
+            continue;
+        }
+        for(int n=0; n<nfds; n++){
+            if(events[n].data.fd == serverSockId){
+                newFd=accept(serverSockId,(struct sockaddr*)&client,&length);
+                if(newFd<0){
+                    perror("ServerListen:accept error!\n");
+                }
+            }
+        }
 
-        struct sockaddr_in client;
+
+        /*struct sockaddr_in client;
         socklen_t   length = sizeof(client);
         int clientSockId = accept(serverSockId, (struct sockaddr*)&client, &length);
         if (clientSockId < 0)
@@ -66,6 +83,6 @@ void ServerListen(int serverSockId){
             printf("ServerListen:server recieve data failed!\n");
             break;
         }
-        printf("Received:%s\n",buffer);
+        printf("Received:%s\n",buffer);*/
     }
 }
