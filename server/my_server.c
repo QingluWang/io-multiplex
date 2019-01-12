@@ -2,20 +2,72 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <errno.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/epoll.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <fcntl.h>
 #include <time.h>
-#include <sys/epoll.h>
 #include <pthread.h>
+#include <sys/resource.h>
 #include "../util/my_util.h"
 #include "../tcp/my_tcp.h"
 
+
+
 #define MAXEPOLLSIZE 10000
+int setnonblocking(int sockfd) 
+{ 
+    if (fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFD, 0)|O_NONBLOCK) == -1) { 
+        return -1; 
+    } 
+    return 0; 
+}
+void* PthreadHandleMsg(void* para){
+    char buffer[MAX_LEN];
+    memset(buffer,0,sizeof(buffer));
+    int flag=1;
+    int receBytes=0;
+    int sockFd=*(int*)para;
+    while(flag){
+        receBytes=recv(sockFd,buffer,MAX_LEN,0);
+        if(receBytes<0){
+            if(errno == EAGAIN){
+                printf("ServerListen:EAGAIN\n");
+                break;
+            }
+            else{
+                printf("ServerListen:receive error!\n");
+                close(sockFd);
+                break;
+            }
+        }
+        else if(receBytes == 0){
+            flag=0;
+        }
+        if(receBytes == sizeof(buffer))
+            flag=1;
+        else
+            flag=0;
+    }
+
+    if(receBytes>0)
+        printf("Received:%s\n",buffer);
+}
 
 int ServerInit(uint16_t port){
+    /* 设置每个进程允许打开的最大文件数 */ 
+    struct rlimit rt;
+    rt.rlim_max = rt.rlim_cur = MAXEPOLLSIZE+5; 
+    if (setrlimit(RLIMIT_NOFILE, &rt) == -1) { 
+        perror("ServerListen:setrlimit"); 
+        exit(1); 
+    }
+
     int sockId = TcpCreate();
     int set = 1;  
     setsockopt(sockId, SOL_SOCKET, SO_REUSEADDR, &set, sizeof(int)); 
@@ -28,7 +80,7 @@ int ServerInit(uint16_t port){
     if(bind(sockId,(struct sockaddr*)&server,sizeof(server)) < 0){
         perror("ServerInit: socket bind error");
     };
-    if(listen(sockId,4) < 0){
+    if(listen(sockId,100) < 0){
         perror("ServerInit: socket listen error");
     };
     setnonblocking(sockId);
@@ -71,6 +123,18 @@ void ServerListen(int serverSockId){
                 }
                 curds++;
             }
+            else{
+                pthread_attr_t attr;
+                pthread_t threadId;
+
+                pthread_attr_init(&attr);
+                pthread_attr_setscope(&attr,PTHREAD_SCOPE_SYSTEM);
+                pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
+
+                if(pthread_create(&threadId,&attr,PthreadHandleMsg,(void*)&(events[n].data.fd))){
+                    perror("ServerListen:pthread create error!\n");
+                }
+            }
         }
 
 
@@ -94,3 +158,6 @@ void ServerListen(int serverSockId){
         printf("Received:%s\n",buffer);*/
     }
 }
+
+
+
