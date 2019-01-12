@@ -8,11 +8,12 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <time.h>
+#include <sys/epoll.h>
 #include "../util/my_util.h"
 #include "../tcp/my_tcp.h"
 
 int ServerInit(uint16_t port){
-    int sockId=TcpCreate();
+    int sockId = TcpCreate();
     int set = 1;  
     setsockopt(sockId, SOL_SOCKET, SO_REUSEADDR, &set, sizeof(int)); 
     struct sockaddr_in server;
@@ -30,6 +31,21 @@ int ServerInit(uint16_t port){
     return sockId;
 }
 void ServerListen(int serverSockId){
+    struct epoll_event event;
+    struct epoll_event wait_event;
+    int fdArr[MAX_OPEN];
+    memset(fdArr,-1,sizeof(fdArr));
+    fdArr[0]=serverSockId;
+    int epfd = epoll_create(MAX_OPEN);  
+    if( -1 == epfd ){  
+        perror ("ServerListen:epoll create failed!\n");  
+    }
+    event.data.fd=serverSockId;
+    event.events=EPOLLIN;
+    int ret = epoll_ctl(epfd, EPOLL_CTL_ADD, serverSockId, &event); 
+    if(-1 == ret){
+        perror ("ServerListen:epoll ctl failed!\n");  
+    }
     while(1){
         struct sockaddr_in client;
         socklen_t   length = sizeof(client);
