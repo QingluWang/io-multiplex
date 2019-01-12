@@ -9,10 +9,11 @@ static const char serverAddr[]="127.0.0.1";
 static const uint16_t port=17989;
 int main(int argc,char* argv[]){
     int sockId=ClientConnect(serverAddr,port);
-    char buffer[MAX_LEN];
-    bzero(buffer,sizeof(buffer));
+    char buffer[MAX_LEN];    
     int num=RandomNum(1000);
-    ClientSendMsg(sockId,itoa(num,buffer,10));
+    bzero(buffer,sizeof(buffer));
+    sprintf(buffer,"%d",num);
+    ClientSendMsg(sockId,buffer);
     close(sockId);
     return 0;
 }

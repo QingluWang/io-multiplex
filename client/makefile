@@ -4,7 +4,7 @@ obj=client_main.o my_client.o my_tcp.o
 
 $(target):$(obj)
 	$(CC) $^ -o $@ $(CFLAGS)
-client_main.o:client_main.c
+client_main.o:client_main.c ../util/my_util.h
 	$(CC) -c $< -o $@ $(CFLAGS)
 my_client.o:my_client.c my_client.h
 	$(CC) -c $< -o $@ $(CFLAGS)
