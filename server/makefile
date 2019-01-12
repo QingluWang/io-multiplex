@@ -6,9 +6,9 @@ $(target):$(obj)
 	$(CC) $^ -o $@ $(CFLAGS)
 server_main.o:server_main.c
 	$(CC) -c $< -o $@ $(CFLAGS)
-my_server.o:my_server.c my_server.h
+my_server.o:my_server.c
 	$(CC) -c $< -o $@ $(CFLAGS)
-my_tcp.o:../tcp/my_tcp.c ../tcp/my_tcp.h
+my_tcp.o:../tcp/my_tcp.c
 	$(CC) -c $< -o $@ $(CFLAGS)
 clean:
 	rm -rf $(obj) $(target)

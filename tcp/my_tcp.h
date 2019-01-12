@@ -2,7 +2,7 @@
 #define _MY_TCP_H
 
 int TcpCreate();
-void TcpSend(int sockId,char buffer[]);
+void TcpSend(int sockId,const char* buffer);
 void TcpClose(int sockId);
 
 #endif
