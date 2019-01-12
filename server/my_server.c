@@ -34,7 +34,6 @@ void ServerListen(int serverSockId){
         struct sockaddr_in client;
         socklen_t   length = sizeof(client);
         int clientSockId = accept(serverSockId, (struct sockaddr*)&client, &length);
-        printf("%d\n",serverSockId);
         if (clientSockId < 0)
         {
             printf("ServerListen:server accept failed!\n");
