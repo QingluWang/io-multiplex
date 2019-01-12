@@ -20,7 +20,6 @@ int ServerInit(uint16_t port){
     server.sin_family = AF_INET;
     server.sin_port = htons(port);
     server.sin_addr.s_addr = INADDR_ANY;
-    socklen_t addr_len = sizeof(server);
 
     if(bind(sockId,(struct sockaddr*)&server,sizeof(server)) < 0){
         perror("ServerInit: socket bind error");
@@ -35,6 +34,7 @@ void ServerListen(int serverSockId){
         struct sockaddr_in client;
         socklen_t   length = sizeof(client);
         int clientSockId = accept(serverSockId, (struct sockaddr*)&client, &length);
+        printf("%d\n",serverSockId);
         if (clientSockId < 0)
         {
             printf("ServerListen:server accept failed!\n");
