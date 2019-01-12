@@ -1,5 +1,5 @@
 CFLAGS=-Wall -g -lpthread
-target=server
+target=server.out
 obj=server_main.o my_server.o my_tcp.o
 
 $(target):$(obj)

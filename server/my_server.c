@@ -20,7 +20,7 @@ int ServerInit(uint16_t port){
     server.sin_family = AF_INET;
     server.sin_port = htons(port);
     server.sin_addr.s_addr = INADDR_ANY;
-    socklen_t addr_len = sizeof(client);
+    socklen_t addr_len = sizeof(server);
 
     if(bind(sockId,(struct sockaddr*)&server,sizeof(server)) < 0){
         perror("ServerInit: socket bind error");
@@ -33,7 +33,7 @@ int ServerInit(uint16_t port){
 void ServerListen(int serverSockId){
     while(1){
         struct sockaddr_in client;
-        socklen_t   length = sizeof(client_addr);
+        socklen_t   length = sizeof(client);
         int clientSockId = accept(serverSockId, (struct sockaddr*)&client, &length);
         if (clientSockId < 0)
         {
