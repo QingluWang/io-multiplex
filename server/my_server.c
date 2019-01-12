@@ -12,6 +12,8 @@
 #include "../util/my_util.h"
 #include "../tcp/my_tcp.h"
 
+#define MAXEPOLLSIZE 10000
+
 int ServerInit(uint16_t port){
     int sockId = TcpCreate();
     int set = 1;  
@@ -31,22 +33,22 @@ int ServerInit(uint16_t port){
     return sockId;
 }
 void ServerListen(int serverSockId){
-    struct epoll_event event;
-    struct epoll_event wait_event;
-    int fdArr[MAX_OPEN];
-    memset(fdArr,-1,sizeof(fdArr));
-    fdArr[0]=serverSockId;
-    int epfd = epoll_create(MAX_OPEN);  
+    struct epoll_event ev;
+    struct epoll_event events[MAXEPOLLSIZE];
+    int epfd = epoll_create(MAXEPOLLSIZE);
     if( -1 == epfd ){  
         perror ("ServerListen:epoll create failed!\n");  
     }
-    event.data.fd=serverSockId;
-    event.events=EPOLLIN;
-    int ret = epoll_ctl(epfd, EPOLL_CTL_ADD, serverSockId, &event); 
+    ev.data.fd=serverSockId;
+    ev.events=EPOLLIN;
+    int ret = epoll_ctl(epfd, EPOLL_CTL_ADD, serverSockId, &ev); 
     if(-1 == ret){
         perror ("ServerListen:epoll ctl failed!\n");  
     }
+    int nfds,maxi;
     while(1){
+        nfds = epoll_wait(epfd,events,20,500);
+
         struct sockaddr_in client;
         socklen_t   length = sizeof(client);
         int clientSockId = accept(serverSockId, (struct sockaddr*)&client, &length);
