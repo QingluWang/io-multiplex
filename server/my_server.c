@@ -88,13 +88,13 @@ void ServerListen(int serverSockId){
     struct epoll_event events[MAXEPOLLSIZE];
     int epfd = epoll_create(MAXEPOLLSIZE);
     if( -1 == epfd ){  
-        perror ("ServerListen:epoll create error!\n");  
+        perror ("ServerListen:epoll create error!");  
     }
     ev.data.fd=serverSockId;
     ev.events=EPOLLIN | EPOLLET;
     int ret = epoll_ctl(epfd, EPOLL_CTL_ADD, serverSockId, &ev); 
     if(-1 == ret){
-        perror ("ServerListen:epoll ctl error!\n");  
+        perror ("ServerListen:epoll ctl error!");  
     }
     int newFd,nfds,maxi,curds=1;
     struct sockaddr_in client;
@@ -102,14 +102,14 @@ void ServerListen(int serverSockId){
     while(1){
         nfds = epoll_wait(epfd,events,curds,-1);
         if(-1 == nfds){
-            perror("ServerListen:epoll wait error!\n");
+            perror("ServerListen:epoll wait error!");
             continue;
         }
         for(int n=0; n<nfds; n++){
             if(events[n].data.fd == serverSockId){
                 newFd=accept(serverSockId,(struct sockaddr*)&client,&length);
                 if(newFd<0){
-                    perror("ServerListen:accept error!\n");
+                    perror("ServerListen:accept error!");
                     continue;
                 }
                 setnonblocking(newFd);
@@ -129,7 +129,7 @@ void ServerListen(int serverSockId){
                 pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
 
                 if(pthread_create(&threadId,&attr,PthreadHandleMsg,(void*)&(events[n].data.fd))){
-                    perror("ServerListen:pthread create error!\n");
+                    perror("ServerListen:pthread create error!");
                 }
             }
         }
