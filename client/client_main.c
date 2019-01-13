@@ -9,7 +9,7 @@
 
 static const char serverAddr[]="127.0.0.1";
 static const uint16_t port=17989;
-static const int childProcessCount=7500;
+static const int childProcessCount=7000;
 
 int main(int argc,char* argv[]){
     char buffer[MAX_LEN];  
@@ -17,7 +17,7 @@ int main(int argc,char* argv[]){
     int sockId=ClientConnect(serverAddr,port);
     pid_t pid;
     int i=0;
-    for(; i<childProcessCount; i++){
+    for(; i<childProcessCount/2; i++){
         pid=fork();
         if(0 == pid || -1 == pid)
             break;
