@@ -54,6 +54,7 @@ void* PthreadHandleMsg(void* para){
 
     if(receBytes>0)
         printf("Received:%s\n",buffer);
+    return 0;
 }
 
 int ServerInit(uint16_t port){
@@ -96,7 +97,7 @@ void ServerListen(int serverSockId){
     if(-1 == ret){
         perror ("ServerListen:epoll ctl error!");  
     }
-    int newFd,nfds,maxi,curds=1;
+    int newFd,nfds,curds=1;
     struct sockaddr_in client;
     socklen_t length = sizeof(struct sockaddr_in);
     while(1){
@@ -116,7 +117,7 @@ void ServerListen(int serverSockId){
                 ev.events = EPOLLIN | EPOLLET; 
                 ev.data.fd = newFd;
                 if(epoll_ctl(epfd,EPOLL_CTL_ADD,newFd,&ev)<0){
-                    fprintf("ServerListen:put socket %d to epoll failed",newFd);
+                    printf("ServerListen:put socket %d to epoll failed",newFd);
                 }
                 curds++;
             }
