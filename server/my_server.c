@@ -32,6 +32,7 @@ void* PthreadHandleMsg(void* para){
     int sockFd=*(int*)para;
     while(flag){
         receBytes=recv(sockFd,buffer,MAX_LEN,0);
+        printf("%d\n",receBytes);
         if(receBytes<0){
             if(errno == EAGAIN){
                 printf("ServerListen:EAGAIN\n");
@@ -46,12 +47,13 @@ void* PthreadHandleMsg(void* para){
         else if(receBytes == 0){
             flag=0;
         }
-        if(receBytes == sizeof(buffer))
+        if(receBytes == sizeof(buffer)){
             flag=1;
+        }
         else
             flag=0;
     }
-
+    buffer[receBytes]='\0';
     if(receBytes>0)
         printf("Received:%s\n",buffer);
     return 0;
@@ -60,7 +62,7 @@ void* PthreadHandleMsg(void* para){
 int ServerInit(uint16_t port){
     /* 设置每个进程允许打开的最大文件数 */ 
     struct rlimit rt;
-    rt.rlim_max = rt.rlim_cur = MAXEPOLLSIZE+5;//server has 5 gap 
+    rt.rlim_max = rt.rlim_cur = MAXEPOLLSIZE;//server has 5 gap 
     if (setrlimit(RLIMIT_NOFILE, &rt) == -1) { 
         perror("ServerListen:setrlimit"); 
         exit(1); 
