@@ -132,23 +132,13 @@ void ServerListen(int serverSockId){
             }
             else{
 
-                /*pthread_attr_t attr;
-                pthread_t threadId;
-
-                pthread_attr_init(&attr);
-                pthread_attr_setscope(&attr,PTHREAD_SCOPE_SYSTEM);
-                pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);*/
-
                 pthread_t tid;
                 int status=pthread_create(&tid,NULL,PthreadHandleMsg,(void*)&(events[n].data.fd));
                 if(status != 0){
                     perror("ServerListen:pthread_create error!\n");
                 }
                 pthread_detach(tid);
-                usleep(100);
-                /*if(pthread_create(&threadId,&attr,PthreadHandleMsg,(void*)&(events[n].data.fd))){
-                    perror("ServerListen:pthread create error!");
-                }*/
+                usleep(500);
             }
         }
     }

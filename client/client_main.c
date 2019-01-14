@@ -19,6 +19,7 @@
 static const char serverAddr[]="127.0.0.1";
 static const uint16_t port=17989;
 static int count = 0;
+static int theryNum=0;
 
 void* PthreadSendMsg(void* para){
     int sockFd=ClientConnect(serverAddr,port);
@@ -27,7 +28,7 @@ void* PthreadSendMsg(void* para){
     char buffer[128]={0};
     sprintf(buffer,"%d",seq);
     ClientSendMsg(sockFd,buffer);
-    printf("Send:%s  Count:%d\n",buffer,count++);
+    printf("Send:%s  Count:%d  TheryNum:%d\n",buffer,count++,theryNum);
     pthread_exit(0);
 }
 int main(int argc,char* argv[]){
@@ -38,18 +39,9 @@ int main(int argc,char* argv[]){
         perror("ServerListen:setrlimit"); 
         exit(1); 
     }
-
-    /*int sockFd=ClientConnect(serverAddr,port);
-    int receBytes=0;
-    char buffer[MAX_LEN];
-    memset(buffer,0,sizeof(buffer));
-    while((receBytes=recv(sockFd,buffer,MAX_LEN,0)) > 0){
-        printf("Receive:%s\n",buffer);
-        receBytes=0;
-    }*/
     int i=0;
-    int num=atoi(argv[1]);
-    for(; i<num; i++){
+    theryNum=atoi(argv[1]);
+    for(; i<theryNum; i++){
         pthread_t tid;
         int status=pthread_create(&tid,NULL,PthreadSendMsg,(void*)&i);
         if(status != 0){
