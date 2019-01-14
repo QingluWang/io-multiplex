@@ -22,7 +22,6 @@ void TcpSend(int sockId,const char* buffer){
         perror("TcpSend: send message error");  
         exit(0); 
     }
-    //bzero(buffer,MAX_LEN);
 }
 void TcpClose(int sockId){
     close(sockId);

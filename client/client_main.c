@@ -3,21 +3,16 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/types.h>
 #include "my_client.h"
 #include "../util/my_util.h"
 
 static const char serverAddr[]="127.0.0.1";
 static const uint16_t port=17989;
+
 int main(int argc,char* argv[]){
-    char buffer[MAX_LEN];  
-    bzero(buffer,sizeof(buffer));
-    for(int i=0; i<MAXEPOLLSIZE; i++){
-        int sockId=ClientConnect(serverAddr,port);
-        //int num=RandomNum(1000);
-        sprintf(buffer,"%d",i);
-        ClientSendMsg(sockId,buffer);
-        close(sockId);
-        printf("Send:%s\n",buffer);
-    }
+    pid_t pid;
+    int sockFd=ClientConnect(serverAddr,port);
+    ClientSendMsg(sockFd,argv[1]);
     return 0;
 }
