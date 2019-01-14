@@ -19,8 +19,10 @@ int ClientConnect(const char* serverAddr,uint16_t port){
     server.sin_addr.s_addr = inet_addr(serverAddr);
 
     int ret=connect(sockId,(struct sockaddr*)&server,sizeof(server));
-    if(ret == -1){
-        perror("ClientConnect: socket connect error");
+    while(ret < 0){
+        printf("ClientConnect: socket connect error\n");
+        sleep(1);
+        ret=connect(sockId,(struct sockaddr*)&server,sizeof(server));
     }
     return sockId;
 }

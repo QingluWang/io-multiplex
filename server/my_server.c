@@ -53,6 +53,7 @@ void* PthreadHandleMsg(void* para){
             flag=0;
     }
     if(receBytes>0){
+        printf("Received:%s\n",buffer);
         int sendBytes=send(sockFd,buffer,strlen(buffer),0);
         if(sendBytes == -1){
            perror("PthreadHandleMsg:send msg to client error!"); 
@@ -60,7 +61,7 @@ void* PthreadHandleMsg(void* para){
         close(sockFd);
     }
     close(sockFd);
-    return 0;
+    pthread_exit(0);
 }
 
 int ServerInit(uint16_t port){
@@ -84,7 +85,7 @@ int ServerInit(uint16_t port){
     if(bind(sockId,(struct sockaddr*)&server,sizeof(server)) < 0){
         perror("ServerInit: socket bind error");
     };
-    if(listen(sockId,100) < 0){
+    if(listen(sockId,MAXEPOLLSIZE) < 0){
         perror("ServerInit: socket listen error");
     };
     setnonblocking(sockId);
@@ -112,6 +113,7 @@ void ServerListen(int serverSockId){
             perror("ServerListen:epoll wait error!");
             continue;
         }
+        //printf("nfds=%d\n",nfds);
         for(int n=0; n<nfds; n++){
             if(events[n].data.fd == serverSockId){
                 newFd=accept(serverSockId,(struct sockaddr*)&client,&length);
@@ -119,6 +121,7 @@ void ServerListen(int serverSockId){
                     perror("ServerListen:accept error!");
                     continue;
                 }
+                //printf("%s\n",inet_ntoa(client.sin_addr));
                 setnonblocking(newFd);
                 ev.events = EPOLLIN | EPOLLET; 
                 ev.data.fd = newFd;
@@ -128,16 +131,24 @@ void ServerListen(int serverSockId){
                 curds++;
             }
             else{
-                pthread_attr_t attr;
+
+                /*pthread_attr_t attr;
                 pthread_t threadId;
 
                 pthread_attr_init(&attr);
                 pthread_attr_setscope(&attr,PTHREAD_SCOPE_SYSTEM);
-                pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
+                pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);*/
 
-                if(pthread_create(&threadId,&attr,PthreadHandleMsg,(void*)&(events[n].data.fd))){
-                    perror("ServerListen:pthread create error!");
+                pthread_t tid;
+                int status=pthread_create(&tid,NULL,PthreadHandleMsg,(void*)&(events[n].data.fd));
+                if(status != 0){
+                    perror("ServerListen:pthread_create error!\n");
                 }
+                pthread_detach(tid);
+                usleep(100);
+                /*if(pthread_create(&threadId,&attr,PthreadHandleMsg,(void*)&(events[n].data.fd))){
+                    perror("ServerListen:pthread create error!");
+                }*/
             }
         }
     }
