@@ -21,7 +21,7 @@ int ClientConnect(const char* serverAddr,uint16_t port){
     /*if error,repeat send util send sucessfully*/
     int ret=connect(sockId,(struct sockaddr*)&server,sizeof(server));
     while(ret < 0){
-        printf("ClientConnect: socket connect error\n");
+        //printf("ClientConnect: socket connect error\n");
         sleep(1);
         ret=connect(sockId,(struct sockaddr*)&server,sizeof(server));
     }

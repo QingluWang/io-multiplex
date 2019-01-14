@@ -17,6 +17,7 @@
 #include "../util/my_util.h"
 #include "../tcp/my_tcp.h"
 
+static int count = 0;
 int setnonblocking(int sockfd) 
 { 
     if (fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFD, 0)|O_NONBLOCK) == -1) { 
@@ -39,7 +40,6 @@ void* PthreadHandleMsg(void* para){
             }
             else{
                 printf("ServerListen:receive error!\n");
-                close(sockFd);
                 break;
             }
         }
@@ -53,7 +53,7 @@ void* PthreadHandleMsg(void* para){
             flag=0;
     }
     if(receBytes>0){
-        printf("Received:%s\n",buffer);
+        printf("Received:%s  Count:%d\n",buffer,count++);
         int sendBytes=send(sockFd,buffer,strlen(buffer),0);
         if(sendBytes == -1){
            perror("PthreadHandleMsg:send msg to client error!"); 

@@ -18,6 +18,7 @@
 
 static const char serverAddr[]="127.0.0.1";
 static const uint16_t port=17989;
+static int count = 0;
 
 void* PthreadSendMsg(void* para){
     int sockFd=ClientConnect(serverAddr,port);
@@ -26,7 +27,7 @@ void* PthreadSendMsg(void* para){
     char buffer[128]={0};
     sprintf(buffer,"%d",seq);
     ClientSendMsg(sockFd,buffer);
-    printf("Send:%s\n",buffer);
+    printf("Send:%s  Count:%d\n",buffer,count++);
     pthread_exit(0);
 }
 int main(int argc,char* argv[]){
