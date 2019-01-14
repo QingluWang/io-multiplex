@@ -52,8 +52,14 @@ void* PthreadHandleMsg(void* para){
         else
             flag=0;
     }
-    if(receBytes>0)
-        printf("Received:%s\n",buffer);
+    if(receBytes>0){
+        int sendBytes=send(sockFd,buffer,strlen(buffer),0);
+        if(sendBytes == -1){
+           perror("PthreadHandleMsg:send msg to client error!"); 
+        }
+        close(sockFd);
+    }
+    close(sockFd);
     return 0;
 }
 

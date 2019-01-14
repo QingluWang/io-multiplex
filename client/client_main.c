@@ -11,6 +11,7 @@ static const char serverAddr[]="127.0.0.1";
 static const uint16_t port=17989;
 
 int main(int argc,char* argv[]){
+    pid_t pid;
     int sockFd=ClientConnect(serverAddr,port);
     ClientSendMsg(sockFd,argv[1]);
     return 0;

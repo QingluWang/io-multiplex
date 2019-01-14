@@ -6,6 +6,7 @@
 
 static const uint16_t port=17989;
 int main(int argc,char* argv[]){
+    daemon(0,0);
     int serverSockId=ServerInit(port);
     ServerListen(serverSockId);
     close(serverSockId);
