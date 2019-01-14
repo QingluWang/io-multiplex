@@ -32,7 +32,6 @@ void* PthreadHandleMsg(void* para){
     int sockFd=*(int*)para;
     while(flag){
         receBytes=recv(sockFd,buffer,MAX_LEN,0);
-        printf("%d\n",receBytes);
         if(receBytes<0){
             if(errno == EAGAIN){
                 printf("ServerListen:EAGAIN\n");
