@@ -53,7 +53,6 @@ void* PthreadHandleMsg(void* para){
         else
             flag=0;
     }
-    buffer[receBytes]='\0';
     if(receBytes>0)
         printf("Received:%s\n",buffer);
     return 0;
@@ -62,7 +61,7 @@ void* PthreadHandleMsg(void* para){
 int ServerInit(uint16_t port){
     /* 设置每个进程允许打开的最大文件数 */ 
     struct rlimit rt;
-    rt.rlim_max = rt.rlim_cur = MAXEPOLLSIZE;//server has 5 gap 
+    rt.rlim_max = rt.rlim_cur = MAXEPOLLSIZE; 
     if (setrlimit(RLIMIT_NOFILE, &rt) == -1) { 
         perror("ServerListen:setrlimit"); 
         exit(1); 
