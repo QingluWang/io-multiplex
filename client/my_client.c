@@ -18,7 +18,7 @@ int ClientConnect(const char* serverAddr,uint16_t port){
     server.sin_port = htons(port);
     server.sin_addr.s_addr = inet_addr(serverAddr);
 
-    /*if error,repeat send util send sucessfully*/
+    /* 如果连接失败，重复连接直至成功 */
     int ret=connect(sockId,(struct sockaddr*)&server,sizeof(server));
     while(ret < 0){
         //printf("ClientConnect: socket connect error\n");

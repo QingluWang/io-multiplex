@@ -26,10 +26,9 @@ void* PthreadSendMsg(void* para){
     int sockFd=ClientConnect(g_serverAddr,g_port);
     int seq=*(int*)para;
     char buffer[128]={0};
-    g_count++;
     sprintf(buffer,"%d",g_count);
     ClientSendMsg(sockFd,buffer);
-    printf("NO.%d pthread's sockFd=%d Send:%s  Count:%d  TheryNum:%d\n",seq,sockFd,buffer,g_count,g_theryNum);
+    printf("NO.%d pthread's sockFd=%d Send:%s  Count:%d  TheryNum:%d\n",seq,sockFd,buffer,g_count++,g_theryNum);
     pthread_exit(0);
 }
 int main(int argc,char* argv[]){
@@ -61,7 +60,7 @@ int main(int argc,char* argv[]){
         /*if(0 != pthread_attr_destroy(&attr)){
             perror("client main:pthread_attr_destroy error!\n");
         }*/
-    }
+    }//end for
     sleep(5);
     return 0;
 }

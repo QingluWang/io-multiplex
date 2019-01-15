@@ -18,6 +18,7 @@
 #include "../tcp/my_tcp.h"
 
 static int g_count = 0;
+/* 设置socket为非阻塞 */
 int setnonblocking(int sockfd) 
 { 
     if (fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFD, 0)|O_NONBLOCK) == -1) { 
@@ -116,7 +117,7 @@ void ServerListen(int serverSockId){
         }
         //printf("curds:%d\n",curds);
         for(int n=0; n<nfds; n++){
-            if(events[n].data.fd == serverSockId)//new link
+            if(events[n].data.fd == serverSockId)//有新连接
             {
                 newFd=accept(serverSockId,(struct sockaddr*)&client,&length);
                 if(newFd<0){
@@ -132,7 +133,7 @@ void ServerListen(int serverSockId){
                 }
                 curds++;
             }
-            else if(events[n].events&EPOLLIN)//recevied data
+            else if(events[n].events&EPOLLIN)//收到数据
             {
                 if(events[n].data.fd<0)
                     continue;
