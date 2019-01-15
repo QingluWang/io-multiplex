@@ -26,12 +26,15 @@ void* PthreadSendMsg(void* para){
     int sockFd=ClientConnect(g_serverAddr,g_port);
     int seq=*(int*)para;
     char buffer[128]={0};
-    sprintf(buffer,"%d",seq);
+    g_count++;
+    sprintf(buffer,"%d",g_count);
     ClientSendMsg(sockFd,buffer);
-    printf("NO.%d pthread's sockFd=%d Send:%s  Count:%d  TheryNum:%d\n",seq,sockFd,buffer,g_count++,g_theryNum);
+    printf("NO.%d pthread's sockFd=%d Send:%s  Count:%d  TheryNum:%d\n",seq,sockFd,buffer,g_count,g_theryNum);
     pthread_exit(0);
 }
 int main(int argc,char* argv[]){
+    int seconds=atoi(argv[2]);
+    sleep(seconds);
     /* 设置每个进程允许打开的最大文件数 */ 
     struct rlimit rt;
     rt.rlim_max = rt.rlim_cur = MAXEPOLLSIZE; 

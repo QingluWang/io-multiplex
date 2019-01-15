@@ -113,15 +113,19 @@ void ServerListen(int serverSockId){
             perror("ServerListen:epoll wait error!");
             continue;
         }
-        //printf("nfds=%d\n",nfds);
+        printf("curds:%d\n",curds);
         for(int n=0; n<nfds; n++){
-            if(events[n].data.fd == serverSockId){
+            if(events[n].data.fd == serverSockId)//new link
+            {
                 newFd=accept(serverSockId,(struct sockaddr*)&client,&length);
+                //curds++;
                 if(newFd<0){
                     perror("ServerListen:accept error!");
                     continue;
                 }
+                //curds++; 47
                 setnonblocking(newFd);
+                //curds++;
                 ev.events = EPOLLIN | EPOLLET; 
                 ev.data.fd = newFd;
                 if(epoll_ctl(epfd,EPOLL_CTL_ADD,newFd,&ev)<0){
@@ -129,7 +133,16 @@ void ServerListen(int serverSockId){
                 }
                 curds++;
             }
-            else{
+            else if(events[n].events&EPOLLIN)//recevied data
+            {
+                if(events[n].data.fd<0)
+                    continue;
+                int sockFd=events[n].data.fd;
+                char buffer[MAX_LEN];
+                memset(&buffer,0,sizeof(buffer));
+                int receBytes=recv(sockFd,buffer,MAX_LEN,0);
+                if(receBytes>0)
+                    printf("Received:%s Count:%d\n",buffer,g_count++);
                 /*pthread_t tid;
                 pthread_attr_t attr;
                 if(0 != pthread_attr_init(&attr)){
@@ -145,7 +158,7 @@ void ServerListen(int serverSockId){
                 }
                 pthread_detach(tid);
                 usleep(200);*/
-                printf("Receive count %d\n",g_count++);
+                fflush(stdout);
             }
         }
     }
