@@ -44,15 +44,23 @@ int main(int argc,char* argv[]){
     for(; i<theryNum; i++){
         pthread_t tid;
         pthread_attr_t attr;
-        if(pthread_attr_init(&attr)){
-            
+        int stackSize=20480;
+        if(0 != pthread_attr_init(&attr)){
+            perror("client main:pthread_attr_init error!\n");
         }
-        int status=pthread_create(&tid,NULL,PthreadSendMsg,(void*)&i);
+        if(0 != pthread_attr_setstacksize(&attr,stackSize)){
+            perror("client main:pthread_attr_setstacksize error!\n");
+        }
+        int status=pthread_create(&tid,&attr,PthreadSendMsg,(void*)&i);
+        //printf("status:%d\n",status);
         if(status != 0){
             perror("client main:pthread_create error!\n");
         }
         pthread_detach(tid);
-        usleep(500);            
+        if(0 != pthread_attr_destroy(&attr)){
+            perror("client main:pthread_attr_destroy error!\n");
+        }
+        //usleep(500);            
     }
     return 0;
 }
