@@ -18,9 +18,9 @@
 
 static const char g_serverAddr[]="127.0.0.1";
 static const uint16_t g_port=17989;
+static const int g_stackSize=20480;
 static int g_count = 0;
 static int g_theryNum=0;
-static const int g_stackSize=20480;
 
 void* PthreadSendMsg(void* para){
     int sockFd=ClientConnect(g_serverAddr,g_port);
