@@ -17,7 +17,7 @@
 #include "../util/my_util.h"
 #include "../tcp/my_tcp.h"
 
-static int count = 0;
+static int g_count = 0;
 int setnonblocking(int sockfd) 
 { 
     if (fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFD, 0)|O_NONBLOCK) == -1) { 
@@ -31,7 +31,7 @@ void* PthreadHandleMsg(void* para){
     int flag=1;
     int receBytes=0;
     int sockFd=*(int*)para;
-    while(flag){
+    /*while(flag){
         receBytes=recv(sockFd,buffer,MAX_LEN,0);
         if(receBytes<0){
             if(errno == EAGAIN){
@@ -51,9 +51,9 @@ void* PthreadHandleMsg(void* para){
         }
         else
             flag=0;
-    }
-    if(receBytes>0){
-        printf("Received:%s  Count:%d\n",buffer,count++);
+    }*/
+    if((receBytes=recv(sockFd,buffer,MAX_LEN,0))>0){
+        printf("Received:%s  Count:%d\n",buffer,g_count++);
         int sendBytes=send(sockFd,buffer,strlen(buffer),0);
         if(sendBytes == -1){
            perror("PthreadHandleMsg:send msg to client error!"); 
@@ -121,7 +121,6 @@ void ServerListen(int serverSockId){
                     perror("ServerListen:accept error!");
                     continue;
                 }
-                //printf("%s\n",inet_ntoa(client.sin_addr));
                 setnonblocking(newFd);
                 ev.events = EPOLLIN | EPOLLET; 
                 ev.data.fd = newFd;
@@ -131,14 +130,22 @@ void ServerListen(int serverSockId){
                 curds++;
             }
             else{
+                /*pthread_t tid;
+                pthread_attr_t attr;
+                if(0 != pthread_attr_init(&attr)){
+                    perror("client main:pthread_attr_init error!\n");
+                }
+                if(0 != pthread_attr_setstacksize(&attr,20480)){
+                    perror("ServerListen:pthread_attr_setstacksize error!\n");
+                }
 
-                pthread_t tid;
-                int status=pthread_create(&tid,NULL,PthreadHandleMsg,(void*)&(events[n].data.fd));
+                int status=pthread_create(&tid,&attr,PthreadHandleMsg,(void*)&(events[n].data.fd));
                 if(status != 0){
                     perror("ServerListen:pthread_create error!\n");
                 }
                 pthread_detach(tid);
-                usleep(500);
+                usleep(200);*/
+                printf("Receive count %d\n",g_count++);
             }
         }
     }
