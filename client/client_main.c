@@ -43,6 +43,10 @@ int main(int argc,char* argv[]){
     theryNum=atoi(argv[1]);
     for(; i<theryNum; i++){
         pthread_t tid;
+        pthread_attr_t attr;
+        if(pthread_attr_init(&attr)){
+            
+        }
         int status=pthread_create(&tid,NULL,PthreadSendMsg,(void*)&i);
         if(status != 0){
             perror("client main:pthread_create error!\n");
