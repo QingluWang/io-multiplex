@@ -99,7 +99,8 @@ void ServerListen(int serverSockId){
         perror ("ServerListen:epoll create error!");  
     }
     ev.data.fd=serverSockId;
-    ev.events=EPOLLIN | EPOLLET;
+    //ev.events=EPOLLIN | EPOLLET;
+    ev.events=EPOLLIN;
     int ret = epoll_ctl(epfd, EPOLL_CTL_ADD, serverSockId, &ev); 
     if(-1 == ret){
         perror ("ServerListen:epoll ctl error!");  
@@ -113,20 +114,18 @@ void ServerListen(int serverSockId){
             perror("ServerListen:epoll wait error!");
             continue;
         }
-        printf("curds:%d\n",curds);
+        //printf("curds:%d\n",curds);
         for(int n=0; n<nfds; n++){
             if(events[n].data.fd == serverSockId)//new link
             {
                 newFd=accept(serverSockId,(struct sockaddr*)&client,&length);
-                //curds++;
                 if(newFd<0){
                     perror("ServerListen:accept error!");
                     continue;
                 }
-                //curds++; 47
                 setnonblocking(newFd);
-                //curds++;
-                ev.events = EPOLLIN | EPOLLET; 
+                //ev.events=EPOLLIN | EPOLLET;
+                ev.events = EPOLLIN; 
                 ev.data.fd = newFd;
                 if(epoll_ctl(epfd,EPOLL_CTL_ADD,newFd,&ev)<0){
                     printf("ServerListen:put socket %d to epoll failed",newFd);
