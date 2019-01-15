@@ -16,19 +16,19 @@
 #include "../util/my_util.h"
 
 
-static const char serverAddr[]="127.0.0.1";
-static const uint16_t port=17989;
-static int count = 0;
-static int theryNum=0;
+static const char g_serverAddr[]="127.0.0.1";
+static const uint16_t g_port=17989;
+static int g_count = 0;
+static int g_theryNum=0;
+static const int g_stackSize=20480;
 
 void* PthreadSendMsg(void* para){
-    int sockFd=ClientConnect(serverAddr,port);
+    int sockFd=ClientConnect(g_serverAddr,g_port);
     int seq=*(int*)para;
-    //printf("NO.%d pthread's sockFd=%d\n",seq,sockFd);
     char buffer[128]={0};
     sprintf(buffer,"%d",seq);
-    ClientSendMsg(sockFd,buffer);
-    printf("Send:%s  Count:%d  TheryNum:%d\n",buffer,count++,theryNum);
+    //ClientSendMsg(sockFd,buffer);
+    printf("NO.%d pthread's sockFd=%d Send:%s  Count:%d  TheryNum:%d\n",seq,sockFd,buffer,g_count++,g_theryNum);
     pthread_exit(0);
 }
 int main(int argc,char* argv[]){
@@ -40,27 +40,31 @@ int main(int argc,char* argv[]){
         exit(1); 
     }
     int i=0;
-    theryNum=atoi(argv[1]);
-    for(; i<theryNum; i++){
+    g_theryNum=atoi(argv[1]);
+    for(; i<g_theryNum; i++){
         pthread_t tid;
         pthread_attr_t attr;
-        int stackSize=20480;
         if(0 != pthread_attr_init(&attr)){
             perror("client main:pthread_attr_init error!\n");
         }
-        if(0 != pthread_attr_setstacksize(&attr,stackSize)){
+        /*size_t size1=0;
+        pthread_attr_getstacksize(&attr,&size1);
+        printf("before stack size:0x%x\n",size1);*/
+        if(0 != pthread_attr_setstacksize(&attr,g_stackSize)){
             perror("client main:pthread_attr_setstacksize error!\n");
         }
+        /*size_t size2=0;
+        pthread_attr_getstacksize(&attr,&size2);
+        printf("after stack size:0x%x\n",size2);*/
         int status=pthread_create(&tid,&attr,PthreadSendMsg,(void*)&i);
-        //printf("status:%d\n",status);
         if(status != 0){
             perror("client main:pthread_create error!\n");
         }
         pthread_detach(tid);
-        if(0 != pthread_attr_destroy(&attr)){
+        /*if(0 != pthread_attr_destroy(&attr)){
             perror("client main:pthread_attr_destroy error!\n");
-        }
-        //usleep(500);            
+        }*/
     }
+    sleep(5);
     return 0;
 }
